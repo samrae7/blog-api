@@ -42,10 +42,41 @@ namespace BlogApi.Controllers
     [HttpPost]
     public IActionResult Create(Post post)
     {
-      _context.Posts.Add(post); 
+      _context.Posts.Add(post);
       _context.SaveChanges();
 
       return CreatedAtRoute("GetPost", new { id = post.Id }, post);
+    }
+
+    [HttpPut("{id}")]
+    public IActionResult Update(long id, Post post)
+    {
+      var updatedPost = _context.Posts.Find(id);
+      if (post == null)
+      {
+        return NotFound();
+      }
+
+      updatedPost.Title = post.Title;
+      updatedPost.Body = post.Body;
+
+      _context.Posts.Update(updatedPost);
+      _context.SaveChanges();
+      return NoContent();
+    }
+
+    [HttpDelete("{id}")]
+    public IActionResult Delete(long id)
+    {
+      var todo = _context.Posts.Find(id);
+      if (todo == null)
+      {
+        return NotFound();
+      }
+
+      _context.Posts.Remove(todo);
+      _context.SaveChanges();
+      return NoContent();
     }
   }
 }
