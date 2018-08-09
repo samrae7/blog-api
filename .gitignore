@@ -4,3 +4,6 @@
 # Directories #
 bin/
 obj/
+
+# DB
+*.db
