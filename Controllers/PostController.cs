@@ -17,7 +17,7 @@ namespace BlogApi.Controllers
 
       if (_context.Posts.Count() == 0)
       {
-        _context.Posts.Add(new Post { Title = "Post1" });
+        _context.Posts.Add(new Post { Title = "Post1", DateCreated = new System.DateTime()});
         _context.SaveChanges();
       }
     }
@@ -42,6 +42,7 @@ namespace BlogApi.Controllers
     [HttpPost]
     public IActionResult Create(Post post)
     {
+      post.DateCreated = new System.DateTime();
       _context.Posts.Add(post);
       _context.SaveChanges();
 
