@@ -4,18 +4,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 
 namespace BlogApi
 {
-
-
   public class Startup
   {
-    public Startup(IConfiguration configuration)
-    {
-        Configuration = configuration;
-    }
     public IConfiguration Configuration { get; }
+    
+    public Startup(IHostingEnvironment env)
+    {
+      var builder = new ConfigurationBuilder()
+        .SetBasePath(env.ContentRootPath)
+        .AddJsonFile("appsettings.json", 
+                     optional: false, 
+                     reloadOnChange: true)
+        .AddEnvironmentVariables();
+
+      Configuration = builder.Build();
+    }
+    
     public void ConfigureServices(IServiceCollection services)
     {
       services.AddDbContext<PostContext>(opt =>
