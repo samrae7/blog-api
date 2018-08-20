@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using BlogApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Cors;
 
 namespace BlogApi.Controllers
 {
@@ -19,7 +20,7 @@ namespace BlogApi.Controllers
     public string AWS_KEY {get; private set;}
     public string AWS_SECRET {get; private set;}
     public static IConfiguration Configuration { get; set; }
-    private AmazonUploader uploader { get; set; };
+    private AmazonUploader uploader { get; set; }
 
     public S3UploadController(IConfiguration config)
     {
