@@ -1,15 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web;
+using BlogApi;
 using BlogApi.Models;
 using BlogApi.Services;
-using System.Web;
 using Amazon.S3.Model;
-using Microsoft.AspNetCore.Http;
-using BlogApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using Microsoft.AspNetCore.Cors;
 
 namespace BlogApi.Controllers
 {
@@ -43,10 +44,10 @@ namespace BlogApi.Controllers
       var fileStream = request.Body;
       var contentLength = request.ContentLength;
       var contentType = request.ContentType;
-      // string filePath = this.Request.Form.Files.First().FileName;
+      string key = Guid.NewGuid().ToString();
 
       var length = contentLength.HasValue ? (long)contentLength : 0;
-      return uploader.sendMyFileToS3(fileStream, contentType, length).Result;
+      return uploader.sendMyFileToS3(fileStream, contentType, length, key).Result;
     }
   }
 }
