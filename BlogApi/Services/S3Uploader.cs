@@ -29,12 +29,12 @@ namespace BlogApi.Services
         };
         return await client.ListObjectsAsync(request);
     }
-    public async Task<PutObjectResponse> sendMyFileToS3(System.IO.Stream inputStream, string contentType, long contentLength, string fileName = "foobar2")
+    public async Task<PutObjectResponse> sendMyFileToS3(System.IO.Stream inputStream, string contentType, long contentLength, string key)
     {
       PutObjectRequest request = new PutObjectRequest
       {
         BucketName = bucketName,
-        Key = fileName,
+        Key = key,
         ContentType = contentType,
         InputStream = inputStream 
       };

@@ -14,12 +14,6 @@ namespace BlogApi.Controllers
     public PostController(PostContext context)
     {
       _context = context;
-
-      if (_context.Posts.Count() == 0)
-      {
-        _context.Posts.Add(new Post { Title = "Post1", DateCreated = new System.DateTime()});
-        _context.SaveChanges();
-      }
     }
 
     [HttpGet]
