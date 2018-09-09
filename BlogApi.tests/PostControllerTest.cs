@@ -6,40 +6,37 @@ using Xunit;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace BlogApi.tests
 {
   // This file was auto-generated based on version 1.2.0 of the canonical data.
-  public class PostControllerTest
+  public class PostControllerTests
   {
-    [Fact]
-    public void constructor()
+    PostController controller;
+    List<Post> posts;
+    public PostControllerTests()
     {
-      var posts = GetTestPosts();
+      posts = GetTestPosts();
       var mockSet = GetQueryableMockDbSet<Post>(posts);
       var mockContextOptions = new DbContextOptions<PostContext>();
       var mockContext = new Mock<PostContext>(mockContextOptions);
       mockContext.Setup(m => m.Posts).Returns(mockSet);
 
-      var controller = new PostController(mockContext.Object);
-      // var result = controller.GetAll();
-      mockContext.Verify(c => c.Posts, Times.Once());
+      var mockConfig = new Mock<IConfiguration>();
+      mockConfig.Setup(m => m["AWS_KEY"]).Returns("my-aws-key");
+      mockConfig.Setup(m => m["AWS_SECRET"]).Returns("my-aws-secret");
+
+      controller = new PostController(mockContext.Object, mockConfig.Object);
     }
 
     [Fact]
-    public void GetAllCallsPosts()
+    public void GetAllPosts()
     {
-      var posts = GetTestPosts();
-      var mockSet = GetQueryableMockDbSet<Post>(posts);
-      var mockContextOptions = new DbContextOptions<PostContext>();
-      var mockContext = new Mock<PostContext>(mockContextOptions);
-      mockContext.Setup(m => m.Posts).Returns(mockSet);
-
-      var controller = new PostController(mockContext.Object);
       var result = controller.GetAll();
-      mockContext.Verify(c => c.Posts, Times.Exactly(2));
+      Assert.Equal(posts, result.Value);
     }
-    
+
     private static DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
     {
       var queryable = sourceList.AsQueryable();
@@ -59,12 +56,20 @@ namespace BlogApi.tests
       posts.Add(new Post()
       {
         Id = 1,
-        Title = "First test post"
+        Title = "First test post",
+        Intro = "bafafaf",
+        Body = "afafaf",
+        ImageId = "fasfaf",
+        DateCreated = new System.DateTime()
       });
       posts.Add(new Post()
       {
         Id = 2,
-        Title = "Second test post"
+        Title = "Second test post",
+        Intro = "bafafaf",
+        Body = "afafaf",
+        ImageId = "fasfaf",
+        DateCreated = new System.DateTime()
       });
       return posts;
     }
