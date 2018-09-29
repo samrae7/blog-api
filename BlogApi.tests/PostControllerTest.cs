@@ -1,12 +1,17 @@
 using BlogApi;
 using BlogApi.Models;
 using BlogApi.Controllers;
+using BlogApi.Services;
 using Moq;
 using Xunit;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.IO;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BlogApi.tests
 {
@@ -35,6 +40,32 @@ namespace BlogApi.tests
     {
       var result = controller.GetAll();
       Assert.Equal(posts, result.Value);
+    } 
+
+    [Fact]
+    public async void UploadPostImage()
+    // TODO1 refactor so that we are not reliant on sealed class (?) HttpContext
+    {
+      var controllerCtx = new ControllerContext();
+      controllerCtx.HttpContext = new DefaultHttpContext();
+      controller.ControllerContext = controllerCtx;
+
+      var mockAmazonUploader = new Mock<AmazonUploader>("foo", "bar");
+      var task = Task.FromResult("foo");
+      mockAmazonUploader.Setup(mock => mock.sendMyFileToS3(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<long>(), It.IsAny<string>())).Returns(task);
+      // TODO inject this so we don't have to mock like this
+      controller.uploader = mockAmazonUploader.Object;
+
+      OkObjectResult result = (OkObjectResult) await controller.Image(1);
+
+      // mockAmazonUploader.Verify(mock => mock.sendMyFileToS3(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<long>(), It.IsAny<string>()), Times.Once());
+      mockAmazonUploader.Verify();
+      Assert.Equal(task.Result, result.Value);
+
+      // TODO test that the correct post is updated with the return value from sendMyFilesToS3
+      // TODO test that the method errors if sendMyFilesToS3 errors
+      // TODO test that the method returns NotFound if no matching post
+      // TODO separate tests out and rename test methods
     }
 
     private static DbSet<T> GetQueryableMockDbSet<T>(List<T> sourceList) where T : class
@@ -47,6 +78,7 @@ namespace BlogApi.tests
       dbSet.As<IQueryable<T>>().Setup(m => m.ElementType).Returns(queryable.ElementType);
       dbSet.As<IQueryable<T>>().Setup(m => m.GetEnumerator()).Returns(() => queryable.GetEnumerator());
       dbSet.Setup(d => d.Add(It.IsAny<T>())).Callback<T>((s) => sourceList.Add(s));
+      dbSet.Setup(d => d.Find(It.IsAny<long>())).Returns(sourceList[0]);
       return dbSet.Object;
     }
 
