@@ -7,3 +7,5 @@ obj/
 
 # DB
 *.db
+.DS_Store
+
